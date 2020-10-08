@@ -19,6 +19,7 @@ salary_dataset = "clean_kaggle_data.csv"
 
 mc_df = pd.read_csv(dataset_folder + mc_dataset, low_memory=False)
 salary_df = pd.read_csv(dataset_folder + salary_dataset, low_memory=False)
+original_df = salary_df
 ```
 
 
@@ -29,14 +30,14 @@ print("Salary DF shape = {}".format(salary_df.shape))
     Salary DF shape = (12497, 247)
 
 
-The salary dataset has 12497 entries and 247 columns. We will consider the columns pertaining to country, age, education, professional experience, and salary.
+The salary dataset has 12497 entries and 247 columns. We will consider the columns pertaining to sex, country, age, education, years of coding experience, and salary.
 
 
 ```python
 # Selecting and renaming the aformentioned columns:
-salary_df = salary_df[["Q2", "Q3", "Q1", "Q4", "Q5", "Q10"]]
-salary_df = salary_df.rename(columns={"Q2": "sex", "Q3": "country", "Q1": "age", "Q4": "educ", "Q5": "prof_exp", "Q10": "salary"})
-columns = ["sex", "country", "age", "educ", "prof_exp", "salary"]
+salary_df = salary_df[["Q2", "Q3", "Q1", "Q4", "Q15", "Q10"]]
+salary_df = salary_df.rename(columns={"Q2": "sex", "Q3": "country", "Q1": "age", "Q4": "educ", "Q10": "salary", "Q15": "coding_exp_yrs"})
+columns = ["sex", "country", "age", "educ", "coding_exp_yrs", "salary"]
 salary_df.head()
 ```
 
@@ -65,7 +66,7 @@ salary_df.head()
       <th>country</th>
       <th>age</th>
       <th>educ</th>
-      <th>prof_exp</th>
+      <th>coding_exp_yrs</th>
       <th>salary</th>
     </tr>
   </thead>
@@ -76,7 +77,7 @@ salary_df.head()
       <td>France</td>
       <td>22-24</td>
       <td>Master’s degree</td>
-      <td>Software Engineer</td>
+      <td>1-2 years</td>
       <td>40000</td>
     </tr>
     <tr>
@@ -85,7 +86,7 @@ salary_df.head()
       <td>India</td>
       <td>40-44</td>
       <td>Professional degree</td>
-      <td>Software Engineer</td>
+      <td>I have never written code</td>
       <td>7500</td>
     </tr>
     <tr>
@@ -94,7 +95,7 @@ salary_df.head()
       <td>Australia</td>
       <td>40-44</td>
       <td>Master’s degree</td>
-      <td>Other</td>
+      <td>1-2 years</td>
       <td>300000</td>
     </tr>
     <tr>
@@ -103,7 +104,7 @@ salary_df.head()
       <td>India</td>
       <td>22-24</td>
       <td>Bachelor’s degree</td>
-      <td>Other</td>
+      <td>&lt; 1 years</td>
       <td>5000</td>
     </tr>
     <tr>
@@ -112,7 +113,7 @@ salary_df.head()
       <td>France</td>
       <td>50-54</td>
       <td>Master’s degree</td>
-      <td>Data Scientist</td>
+      <td>20+ years</td>
       <td>70000</td>
     </tr>
   </tbody>
@@ -151,7 +152,7 @@ salary_df[columns[:5]].describe()
       <th>country</th>
       <th>age</th>
       <th>educ</th>
-      <th>prof_exp</th>
+      <th>coding_exp_yrs</th>
     </tr>
   </thead>
   <tbody>
@@ -161,7 +162,7 @@ salary_df[columns[:5]].describe()
       <td>12497</td>
       <td>12497</td>
       <td>12497</td>
-      <td>12497</td>
+      <td>11422</td>
     </tr>
     <tr>
       <th>unique</th>
@@ -169,7 +170,7 @@ salary_df[columns[:5]].describe()
       <td>59</td>
       <td>11</td>
       <td>7</td>
-      <td>10</td>
+      <td>7</td>
     </tr>
     <tr>
       <th>top</th>
@@ -177,7 +178,7 @@ salary_df[columns[:5]].describe()
       <td>India</td>
       <td>25-29</td>
       <td>Master’s degree</td>
-      <td>Data Scientist</td>
+      <td>3-5 years</td>
     </tr>
     <tr>
       <th>freq</th>
@@ -185,7 +186,7 @@ salary_df[columns[:5]].describe()
       <td>2477</td>
       <td>3075</td>
       <td>5868</td>
-      <td>3640</td>
+      <td>2818</td>
     </tr>
   </tbody>
 </table>
@@ -213,13 +214,62 @@ salary_df["salary"].describe()
 
 
 
-The following provides insight into the possible values that each entry can take with respect to each column:
+The following code snippet provides insight into the possible values that each entry can take with respect to each column:
 
+
+```python
+print("possible sex values:", salary_df["sex"].unique(), "\n") 
+print("country values examples:", salary_df["country"].unique()[:10], "\n") # truncated because of the tremendous amount of countries
+print("possible age values:", salary_df["age"].unique(), "\n")
+print("posisble education values:", salary_df["educ"].unique(), "\n")
+print("possible years of coding experience values:", salary_df["coding_exp_yrs"].unique())
+```
+
+    possible sex values: ['Male' 'Female' 'Prefer to self-describe' 'Prefer not to say'] 
+    
+    country values examples: ['France' 'India' 'Australia' 'United States of America' 'Netherlands'
+     'Germany' 'Ireland' 'Russia' 'Greece' 'Ukraine'] 
+    
+    possible age values: ['22-24' '40-44' '50-54' '55-59' '30-34' '18-21' '35-39' '25-29' '45-49'
+     '60-69' '70+'] 
+    
+    posisble education values: ['Master’s degree' 'Professional degree' 'Bachelor’s degree'
+     'Doctoral degree'
+     'Some college/university study without earning a bachelor’s degree'
+     'I prefer not to answer' 'No formal education past high school'] 
+    
+    possible years of coding experience values: ['1-2 years' 'I have never written code' '< 1 years' '20+ years'
+     '3-5 years' '5-10 years' '10-20 years' nan]
+
+
+- sex (Q1): "Male", "Female", "Prefer to self-describe", "Prefer not to say"
 - country (Q3): e.g. "Canada", "India"
 - age (Q1): "18-21", "22-24", "25-29", "30-34", "35-39"
 - educ (Q4): e.g. "Master's degree"
-- prof_exp (Q5): e.g. "Data Scientist", "Software Engineer"
+- coding_exp_yrs (Q15): e.g. "1-2 years", "I have never written code"
 - salary (Q10): ranges from 1k-500k (float64)
+
+#### NaN Pre-Processing
+Prior to visualizing our data, we must be aware of NaN values present in our dataset.
+
+
+
+
+```python
+original_df_len = salary_df.count(numeric_only=True)
+print("Total number of data entries =", original_df_len)
+salary_df = salary_df.dropna()
+print("Total number of NaN entries =", original_df_len - salary_df.count(numeric_only=True))
+print("New number of data entries =", salary_df.count(numeric_only=True))
+```
+
+    Total number of data entries = salary    12497
+    dtype: int64
+    Total number of NaN entries = salary    1075
+    dtype: int64
+    New number of data entries = salary    11422
+    dtype: int64
+
 
 #### Countplot of Country Data
 The Figure below illustrates the distribution of data with respect to the country column. As we can see, the responses came primarily from people from India and the United States.
@@ -238,21 +288,20 @@ plt.show()
 
 
     
-![png](README_files/README_9_0.png)
+![svg](README_files/README_13_0.svg)
     
 
 
 #### Countplot of Professional Experience by Age Range
-The plot below illustrates the breakdown of professional experience in each age range. We can see that data scientists were most frequently surveyed for nearly all age ranges. Further, people in the 25-29 age range were the most heavily surveyed. 
+The plot below illustrates the breakdown of professional experience in each age range. We can see that persons from a wide variety of experience levels were surveyed. Most commonly, people with 3-5 years of coding experience were surveyed. The data follows a normal distribution if we consider the possible coding experience values in ascending order:
 
 
 ```python
 plt.figure(figsize=(20,15))
-plt.title("Professional Experience by Age Range Countplot", fontsize=20)
-age_exp_plot_order = ["18-21", "22-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-69", "70+"]
-age_exp_plot = sb.countplot(x='age', hue='prof_exp', data=salary_df, order=age_exp_plot_order)
-age_exp_plot.legend(title="Professional Experience Legend")
-age_exp_plot.set_xlabel("Age Ranges")
+plt.title("Years of Coding Experience by Age Range Countplot", fontsize=20)
+age_exp_plot_order = ['I have never written code', '< 1 years', '1-2 years', '3-5 years', '5-10 years', '10-20 years', '20+ years']
+age_exp_plot = sb.countplot(x='coding_exp_yrs', data=salary_df, order=age_exp_plot_order)
+age_exp_plot.set_xlabel("Years of Coding Experience")
 age_exp_plot.set_ylabel("Count")
 plt.tight_layout()
 plt.show()
@@ -260,7 +309,7 @@ plt.show()
 
 
     
-![png](README_files/README_11_0.png)
+![svg](README_files/README_15_0.svg)
     
 
 
@@ -307,7 +356,7 @@ fig.show()
 
 
     
-![png](README_files/README_14_0.png)
+![svg](README_files/README_18_0.svg)
     
 
 
@@ -316,8 +365,6 @@ fig.show()
 
 #### Salary vs. Gender Box Plots
 Given that we are computing descriptive statistics about males and females, it makes sense to illustrate a box plot of the salaries of males and females to visualize the data. From the plot below we can already appreciate that the average salary of males is noticably higher than that of females as illustrated by the position of Q2. Further, the 3rd quartile is noticably higher for males perhaps hinting at a higher earning potential.
-
-
 
 
 ```python
@@ -342,7 +389,7 @@ fig.show()
 
 
     
-![png](README_files/README_17_0.png)
+![svg](README_files/README_20_0.svg)
     
 
 
@@ -355,9 +402,9 @@ print("Number of females in the dataset = {}".format(females_df.shape[0]))
 print("Number of people that prefer to self-describe or prefer not to say = {}".format(salary_df.shape[0] - males_df.shape[0] - females_df.shape[0]))
 ```
 
-    Number of males in the dataset = 10473
-    Number of females in the dataset = 1827
-    Number of people that prefer to self-describe or prefer not to say = 197
+    Number of males in the dataset = 9623
+    Number of females in the dataset = 1626
+    Number of people that prefer to self-describe or prefer not to say = 173
 
 
 
@@ -368,12 +415,12 @@ males_df.salary.describe()
 
 
 
-    count     10473.000000
-    mean      58709.586556
-    std       74920.620048
+    count      9623.000000
+    mean      59434.895563
+    std       73814.503699
     min        1000.000000
     25%        7500.000000
-    50%       30000.000000
+    50%       40000.000000
     75%       80000.000000
     max      500000.000000
     Name: salary, dtype: float64
@@ -388,9 +435,9 @@ females_df.salary.describe()
 
 
 
-    count      1827.000000
-    mean      45933.771210
-    std       60253.789591
+    count      1626.000000
+    mean      46995.387454
+    std       60215.833417
     min        1000.000000
     25%        3000.000000
     50%       20000.000000
@@ -403,7 +450,7 @@ females_df.salary.describe()
 
 ```python
 # Possible Professional Occupations:
-salary_df["prof_exp"].unique()
+original_df["Q5"].unique()
 ```
 
 
@@ -416,7 +463,7 @@ salary_df["prof_exp"].unique()
 
 
 
-As we can see from the above descriptive statistics and box plots, the average salary of men and women working in the occupations listed above is different. Men make `$`58,710 on average whereas women make `$`45,934 according to this sample. The next section will perform a two-sample t-test to determine if this result is statistically significant.
+As we can see from the above descriptive statistics and box plots, the average salary of men and women working in the occupations listed above is different. Men make `$`59,434.90 on average whereas women make `$`46,995.39 according to this sample. The next section will perform a two-sample t-test to determine if this result is statistically significant.
 
 #### Two-Sample t-Test
 
@@ -428,10 +475,10 @@ tc, pc = stats.ttest_ind(males_df["salary"], females_df["salary"])
 print ("t-test: t = %g  p = %g" % (tc, pc))
 ```
 
-    t-test: t = 6.90935  p = 5.10894e-12
+    t-test: t = 6.44284  p = 1.22048e-10
 
 
-The p-value, or, the probability that we observed these two completely random samples in a world where the null hypothesis is true, i.e. the world in which the means of the salaries of men and women are equal, is 5.10894e-12%. This is less than our threshold of 0.05. Therefore, the difference between the means of these two samples is statistically significant. 
+The p-value, or, the probability that we observed these two completely random samples in a world where the null hypothesis is true, i.e. the world in which the means of the salaries of men and women are equal, is 1.22048e-10. This is less than our threshold of 0.05. Therefore, the difference between the means of these two samples is statistically significant. 
 
 #### Bootstrapping
 We will now compare the two samples using bootstrapping. To do so, we will generate 1000 bootstrap samples for each group. Each of these generated samples will be the same size as the sample it was generated from. Given that we are generating 1000 bootstrap samples, we expect the distribution of the sample means to be normal for both groups. 
@@ -472,19 +519,19 @@ plt.show()
 
 
     
-![png](README_files/README_25_0.png)
+![svg](README_files/README_28_0.svg)
     
 
 
 
     
-![png](README_files/README_25_1.png)
+![svg](README_files/README_28_1.svg)
     
 
 
 
     
-![png](README_files/README_25_2.png)
+![svg](README_files/README_28_2.svg)
     
 
 
@@ -497,7 +544,7 @@ tc, pc = stats.ttest_ind(male_means, female_means)
 print ("t-test: t = %g  p = %g" % (tc, pc))
 ```
 
-    t-test: t = 258.205  p = 0
+    t-test: t = 241.718  p = 0
 
 
 Since p is very close to 0 (p cannot be zero because there is a small probability that we observed the bootstrapped data) and is therefore lesss than our threshold, 0.05, the result is statistically significant.
@@ -512,7 +559,7 @@ The difference between the male and female salary distributions was then compute
 print("The average of the difference of the salaries of the males and females in this dataset is = ${}".format(round(bootstrap_difference.mean(), 2)))
 ```
 
-    The average of the difference of the salaries of the males and females in this dataset is = $12772.14
+    The average of the difference of the salaries of the males and females in this dataset is = $12514.74
 
 
 Since the analysis was univariate, it is difficult to infer why this statistically significant salary difference occurred. It would make sense to continue the analysis by examining the difference between male and female salaries for each occupation at each company. If there was a statistically significant difference present when considering male and female data scientists working at Google, for example, then we could perhaps infer that Google was compensating men and women differently for the exact same job. It is in this way that analyzing data can help motivate social change and enforce corporate responsibility.
@@ -533,11 +580,11 @@ print("\n\nBachelor's descriptive salary statistics:\n", ba_df.salary.describe()
 
     Master's Degree descriptive salary statistics:
     
-     count      5868.000000
-    mean      58778.629857
-    std       70265.728605
+     count      5392.000000
+    mean      59367.581602
+    std       68877.637226
     min        1000.000000
-    25%        7500.000000
+    25%       10000.000000
     50%       40000.000000
     75%       80000.000000
     max      500000.000000
@@ -545,9 +592,9 @@ print("\n\nBachelor's descriptive salary statistics:\n", ba_df.salary.describe()
     
     
     PhD descriptive salary statistics:
-     count      2083.000000
-    mean      75761.401824
-    std       83376.717093
+     count      1937.000000
+    mean      77008.002065
+    std       83645.286166
     min        1000.000000
     25%       15000.000000
     50%       60000.000000
@@ -557,12 +604,12 @@ print("\n\nBachelor's descriptive salary statistics:\n", ba_df.salary.describe()
     
     
     Bachelor's descriptive salary statistics:
-     count      3361.000000
-    mean      44999.256174
-    std       67923.680798
+     count      3048.000000
+    mean      45241.141732
+    std       65473.934920
     min        1000.000000
-    25%        3000.000000
-    50%       15000.000000
+    25%        4000.000000
+    50%       20000.000000
     75%       60000.000000
     max      500000.000000
     Name: salary, dtype: float64
@@ -574,15 +621,17 @@ As we can see from the descriptive statistics above, the mean of the salary colu
 The purpose of performing a one-way ANOVA in this context is to determine if the difference in the sample mean of one of samples relative to all of the other samples is statistically significant. We can perform this analysis because our data was sampled independently, there are more than 30 data entries in each sample, and the standard deviations of the samples are similar as shown above. To perform an ANOVA, we must compute the F-statistic. Our null hypothesis is that the means of all of the populations that the samples were drawn from are equal. From the F-statistic we will compute the p value and compare that value with our threshold of 0.05.
 
 
+
+
 ```python
 f_stat, p_val = stats.f_oneway(phd_df.salary, masters_df.salary, ba_df.salary)
 print ("F-stat: F = %g  p = %g" % (f_stat, p_val))
 ```
 
-    F-stat: F = 117.839  p = 2.23367e-51
+    F-stat: F = 119.618  p = 4.36862e-52
 
 
-Since the p-value of 2.23367e-51 computed above is less than 0.05, we reject the null hypothesis and confirm that the observed data is statistically significant. Either one mean of one of the samples differs from the rest of the group or each sample mean is unique. 
+Since the p-value of 4.36862e-52 computed above is less than 0.05, we reject the null hypothesis and confirm that the observed data is statistically significant. Either one mean of one of the samples differs from the rest of the group or each sample mean is unique. 
 
 #### Education Bootstrap
 Now we will bootstrap the data samples and illustrate the resulting distributions for each sample. We will also illustrate the difference between each distribution combination.
@@ -651,37 +700,37 @@ plt.show()
 
 
     
-![png](README_files/README_37_0.png)
+![svg](README_files/README_40_0.svg)
     
 
 
 
     
-![png](README_files/README_37_1.png)
+![svg](README_files/README_40_1.svg)
     
 
 
 
     
-![png](README_files/README_37_2.png)
+![svg](README_files/README_40_2.svg)
     
 
 
 
     
-![png](README_files/README_37_3.png)
+![svg](README_files/README_40_3.svg)
     
 
 
 
     
-![png](README_files/README_37_4.png)
+![svg](README_files/README_40_4.svg)
     
 
 
 
     
-![png](README_files/README_37_5.png)
+![svg](README_files/README_40_5.svg)
     
 
 
@@ -694,9 +743,9 @@ print("Average salary difference between PhD earners and master's earners = ${}"
 print("Average salary difference between master's earners and bachelor's earners = ${}".format(round(master_ba.mean(), 2)))
 ```
 
-    Average salary difference between PhD earners and bachelor's earners = $30785.89
-    Average salary difference between PhD earners and master's earners = $17045.44
-    Average salary difference between master's earners and bachelor's earners = $13740.45
+    Average salary difference between PhD earners and bachelor's earners = $31765.27
+    Average salary difference between PhD earners and master's earners = $17646.88
+    Average salary difference between master's earners and bachelor's earners = $14118.39
 
 
 #### Statistical Significance Using Bootstrapped Data
@@ -708,7 +757,7 @@ f_stat, p_val = stats.f_oneway(phd_means, master_means, ba_means)
 print ("F-stat: F = %g  p = %g" % (f_stat, p_val))
 ```
 
-    F-stat: F = 125127  p = 0
+    F-stat: F = 130362  p = 0
 
 
 Since p is very close to 0 and less than our threshold value of 0.05, we can conclude that the observed samples are statistically significant and the mean of at least one of the samples is different than the others. 
@@ -722,4 +771,4 @@ We then generated three samples of the means of each group by bootstrapping with
 
 Since we did not explicitly compare accross each group individually, we do not know which group has a mean that is statistically different than the rest. A logical next step would be to compute a two-sample t-test between the PhD and Bachelor's degree groups. Then, using the information gathered from this analysis, continue on with another t-test between the Master's degree and Bachelor's group. Computing the t-test for each combination, although tedious, could prove to be an effective way to characterize the statistical significance of the difference of the means of the salaries between each group. 
 
-We did learn from this analysis that obtaining a higher education after completing a bachelor's degree contributes to a statistically significant salary increase. The approximate average increase appreciated after earning a Master's degree is `$`13,740.45 and the approximate average increase from a Bachelor's degree after earning a PhD is `$`30,785.89. 
+We did learn from this analysis that obtaining a higher education after completing a bachelor's degree contributes to a statistically significant salary increase. The approximate average increase appreciated after earning a Master's degree is `$`14,118.39 and the approximate average increase from a Bachelor's degree after earning a PhD is `$`31,765.27. 
